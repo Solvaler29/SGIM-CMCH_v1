@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Reportes - SGIM-CMCH{% endblock %}
+{% block content %}
+<h2><i class="fas fa-chart-bar me-2 text-primary"></i>Panel de Reportes</h2>
+<p class="text-muted">Todos los indicadores se calculan a partir de registros reales en PostgreSQL.</p>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3"><div class="card bg-primary text-white"><div class="card-body"><h5>Pendientes</h5><p class="display-4">{{ pendientes }}</p></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card bg-info text-white"><div class="card-body"><h5>En Atención</h5><p class="display-4">{{ en_atencion }}</p></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card bg-warning text-white"><div class="card-body"><h5>Pendiente Validación</h5><p class="display-4">{{ pendiente_validacion }}</p></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card bg-success text-white"><div class="card-body"><h5>Cerrados</h5><p class="display-4">{{ cerradas }}</p></div></div></div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-light"><strong>Tickets por Mes</strong></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for m in meses %}
+                    <li class="list-group-item d-flex justify-content-between">{{ m.mes }} <span class="badge bg-primary">{{ m.cantidad }}</span></li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">Sin datos</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-light"><strong>Por Servicio</strong></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for s in por_servicio %}
+                    <li class="list-group-item d-flex justify-content-between">{{ s.servicio__nombre }} <span class="badge bg-info">{{ s.total }}</span></li>
+                    {% empty %}
+                    <li class="list-group-item text-center text-muted">Sin datos</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Tiempo de Respuesta</h5>
+                <p class="display-4">{{ tiempo_respuesta_horas }} h</p>
+                <small class="text-muted">Promedio: creado → asignado</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Tiempo de Solución</h5>
+                <p class="display-4">{{ tiempo_solucion_horas }} h</p>
+                <small class="text-muted">Promedio: creado → cerrado</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Satisfacción Promedio</h5>
+                <p class="display-4">{{ satisfaccion_promedio|default:"--" }}</p>
+                <small class="text-muted">Escala numérica</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: postgres:16
+    container_name: sgim-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - sgim_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  sgim_postgres_data:

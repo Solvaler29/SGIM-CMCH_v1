@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SGIM-CMCH{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'core:dashboard' %}">
+                <i class="fas fa-hospital me-2"></i>SGIM-CMCH
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.tiene_rol == 'solicitante' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:registrar_ticket' %}"><i class="fas fa-plus me-1"></i>Nueva Incidencia</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:lista_tickets' %}"><i class="fas fa-list me-1"></i>Mis Tickets</a></li>
+                        {% elif user.tiene_rol == 'supervisor' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:lista_tickets' %}"><i class="fas fa-list me-1"></i>Bandeja del Área</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'reports:dashboard_reportes' %}"><i class="fas fa-chart-bar me-1"></i>Reportes</a></li>
+                        {% elif user.tiene_rol == 'tecnico' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'maintenance:lista_atenciones' %}"><i class="fas fa-tools me-1"></i>Mis Atenciones</a></li>
+                        {% elif user.tiene_rol == 'administrador' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts:usuarios_list' %}"><i class="fas fa-users me-1"></i>Usuarios</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'reports:dashboard_reportes' %}"><i class="fas fa-chart-bar me-1"></i>Reportes</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'equipment:lista_equipos' %}"><i class="fas fa-qrcode me-1"></i>Equipos QR</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'accounts:perfil' %}">Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Cerrar sesión</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Iniciar sesión</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="mt-5 py-4 bg-light text-muted border-top">
+        <div class="container text-center">
+            <p class="mb-0">SGIM-CMCH - Sistema de Gestión de Incidencias y Mantenimiento del CMCH</p>
+            <p class="mb-0 small">Versión MVP - Datos ficticios para demostración</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

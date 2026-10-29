@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Atención - Ticket {{ ticket.codigo_ticket }}{% endblock %}
+{% block content %}
+<h2><i class="fas fa-tools me-2 text-primary"></i>Registrar Atención Técnica</h2>
+<p>Ticket: <strong>{{ ticket.codigo_ticket }}</strong> - Técnico: {{ request.user.get_full_name|default:request.user.username }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Diagnóstico y Acciones</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Diagnóstico</label>
+                    <textarea name="diagnostico" class="form-control" rows="3">{{ atencion.diagnostico }}</textarea>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Acciones Realizadas</label>
+                    <textarea name="acciones_realizadas" class="form-control" rows="3">{{ atencion.acciones_realizadas }}</textarea>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Observaciones</label>
+                <textarea name="observaciones" class="form-control" rows="2">{{ atencion.observaciones }}</textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Materiales y Repuestos Necesarios</label>
+                    <textarea name="materiales_requeridos" class="form-control" rows="2">{{ atencion.materiales_requeridos }}</textarea>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Recursos Utilizados o Pendientes</label>
+                    <textarea name="recursos_utilizados" class="form-control" rows="2">{{ atencion.recursos_utilizados }}</textarea>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Evidencias Adicionales (referencias)</label>
+                <textarea name="evidencias" class="form-control" rows="2">{{ atencion.evidencias }}</textarea>
+                <div class="form-text">Las fotografías ya adjuntas al ticket se conservan como evidencia.</div>
+            </div>
+        </div>
+        <div class="card-footer bg-light">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Guardar Atención
+            </button>
+            <a href="{% url 'tickets:detalle_ticket' ticket.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

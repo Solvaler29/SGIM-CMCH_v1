@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Priorizar Ticket - SGIM-CMCH{% endblock %}
+{% block content %}
+<h2>Cambiar Prioridad - {{ ticket.codigo_ticket }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Prioridad</label>
+        <select name="prioridad" class="form-select">
+            {% for valor, etiqueta in ticket.PRIORIDADES %}
+            <option value="{{ valor }}" {% if ticket.prioridad == valor %}selected{% endif %}>{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{% url 'tickets:detalle_ticket' ticket.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}

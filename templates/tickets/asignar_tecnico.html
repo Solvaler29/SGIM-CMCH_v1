@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Asignar Técnico - SGIM-CMCH{% endblock %}
+{% block content %}
+<h2>Asignar Técnico - {{ ticket.codigo_ticket }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Técnico</label>
+        <select name="tecnico" class="form-select" required>
+            <option value="">Seleccionar técnico</option>
+            {% for t in tecnicos %}
+            <option value="{{ t.pk }}">{{ t.get_full_name|default:t.username }} ({{ t.areas.all.0.nombre|default:'sin área' }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Asignar</button>
+    <a href="{% url 'tickets:detalle_ticket' ticket.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}

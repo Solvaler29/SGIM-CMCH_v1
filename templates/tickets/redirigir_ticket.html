@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Redirigir Ticket - SGIM-CMCH{% endblock %}
+{% block content %}
+<h2>Redirigir Ticket - {{ ticket.codigo_ticket }}</h2>
+<p>Área actual: <strong>{{ ticket.area_soporte.nombre }}</strong></p>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Nueva Área de Soporte</label>
+        <select name="area_soporte" class="form-select" required>
+            <option value="">Seleccionar área</option>
+            {% for a in areas %}
+            <option value="{{ a.pk }}">{{ a.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-warning">Redirigir</button>
+    <a href="{% url 'tickets:detalle_ticket' ticket.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}

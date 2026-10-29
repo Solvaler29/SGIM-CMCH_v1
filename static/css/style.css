@@ -1,0 +1,47 @@
+/* SGIM-CMCH - Estilos personalizados */
+body {
+    padding-bottom: 60px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.card {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.badge {
+    font-size: 0.85rem;
+    padding: 0.5em 0.75em;
+}
+
+.form-control, .form-select {
+    border-radius: 6px;
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.alert-dismissible {
+    border-radius: 8px;
+}
+
+.table {
+    font-size: 0.9rem;
+}
+
+footer {
+    font-size: 0.85rem;
+}
+
+#resultadoQR {
+    max-width: 100%;
+}

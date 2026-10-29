@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Perfil - SGIM-CMCH{% endblock %}
+{% block content %}
+<h2>Perfil de Usuario</h2>
+<div class="card">
+    <div class="card-body">
+        <p><strong>Usuario:</strong> {{ usuario.username }}</p>
+        <p><strong>Nombre:</strong> {{ usuario.get_full_name }}</p>
+        <p><strong>Rol:</strong> {{ usuario.get_roles_display }}</p>
+        <p><strong>Áreas:</strong> {% for a in usuario.areas.all %}{{ a.nombre }}{% if not forloop.last %}, {% endif %}{% empty %}Ninguna{% endfor %}</p>
+        <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+        <p><strong>Correo:</strong> {{ usuario.correo_notificaciones }}</p>
+        <p><strong>Activo en sistema:</strong> {% if usuario.activo_sistema %}Sí{% else %}No{% endif %}</p>
+    </div>
+</div>
+{% endblock %}

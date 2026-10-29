@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Ticket {{ ticket.codigo_ticket }} - SGIM-CMCH{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-ticket-alt me-2"></i>Ticket {{ ticket.codigo_ticket }}</h2>
+    <span class="badge bg-{{ ticket.estado|estado_badge }} fs-6">{{ ticket.get_estado_display }}</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-light"><strong>Información General</strong></div>
+            <div class="card-body">
+                <p><strong>Servicio:</strong> {{ ticket.servicio.nombre }}</p>
+                <p><strong>Área problema:</strong> {{ ticket.area_problema.nombre }}</p>
+                <p><strong>Área soporte:</strong> {{ ticket.area_soporte.nombre }}</p>
+                <p><strong>Solicitante:</strong> {{ ticket.solicitante.get_full_name|default:ticket.solicitante.username }}</p>
+                <p><strong>Prioridad:</strong> <span class="badge bg-{{ ticket.prioridad|prioridad_badge }}">{{ ticket.get_prioridad_display }}</span></p>
+                <p><strong>Estado:</strong> {{ ticket.get_estado_display }}</p>
+                <p><strong>Registrado:</strong> {{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+                {% if ticket.scheduled_at %}<p><strong>Programado:</strong> {{ ticket.scheduled_at|date:"d/m/Y H:i" }}</p>{% endif %}
+                {% if ticket.equipo %}
+                    <p><strong>Equipo:</strong> {{ ticket.equipo.nombre }} ({{ ticket.equipo.numero_serie }})</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-light"><strong>Descripción</strong></div>
+            <div class="card-body">{{ ticket.descripcion }}</div>
+        </div>
+        {% if ticket.acciones_previas %}
+        <div class="card">
+            <div class="card-header bg-light"><strong>Acciones Previas</strong></div>
+            <div class="card-body">{{ ticket.acciones_previas }}</div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-light"><strong>Acciones</strong></div>
+            <div class="card-body">
+                {% if user.tiene_rol 'supervisor' or user.tiene_rol 'administrador' %}
+                    <a href="{% url 'tickets:priorizar_ticket' ticket.pk %}" class="btn btn-outline-primary w-100 mb-2">Cambiar Prioridad</a>
+                    <a href="{% url 'tickets:asignar_tecnico' ticket.pk %}" class="btn btn-outline-success w-100 mb-2">Asignar Técnico</a>
+                    <a href="{% url 'tickets:redirigir_ticket' ticket.pk %}" class="btn btn-outline-warning w-100 mb-2">Redirigir Área</a>
+                {% endif %}
+                {% if user.tiene_rol 'tecnico' and ticket.estado == 'asignada' %}
+                    <a href="{% url 'maintenance:iniciar_atencion' ticket.pk %}" class="btn btn-primary w-100 mb-2">Iniciar Atención</a>
+                {% endif %}
+                {% if user.tiene_rol 'tecnico' and ticket.estado == 'en_atencion' %}
+                    <a href="{% url 'maintenance:registrar_atencion' ticket.pk %}" class="btn btn-primary w-100 mb-2">Registrar Atención</a>
+                    <a href="{% url 'maintenance:finalizar_atencion' ticket.pk %}" class="btn btn-success w-100 mb-2">Finalizar Atención</a>
+                {% endif %}
+                {% if (user.tiene_rol 'supervisor' or user.tiene_rol 'administrador') and ticket.estado == 'pendiente_validacion' %}
+                    <a href="{% url 'maintenance:revisar_atencion' ticket.pk %}" class="btn btn-primary w-100 mb-2">Revisar Atención</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5>Historial</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Fecha</th><th>Acción</th><th>Usuario</th><th>Detalles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for evento in eventos %}
+            <tr>
+                <td>{{ evento.fecha_hora|date:"d/m/Y H:i" }}</td>
+                <td>{{ evento.get_tipo_accion_display }}</td>
+                <td>{{ evento.usuario.get_full_name|default:evento.usuario.username }}</td>
+                <td>{{ evento.detalles }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Sin historial.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if asignaciones %}
+<h5>Asignaciones</h5>
+<div class="table-responsive">
+    <table class="table table-sm table-hover">
+        <thead class="table-light">
+            <tr><th>Técnico</th><th>Asignado por</th><th>Fecha</th><th>Vigente</th></tr>
+        </thead>
+        <tbody>
+            {% for a in asignaciones %}
+            <tr>
+                <td>{{ a.tecnico.get_full_name|default:a.tecnico.username }}</td>
+                <td>{{ a.asignado_por.get_full_name|default:a.asignado_por.username }}</td>
+                <td>{{ a.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                <td>{% if a.activo %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}
