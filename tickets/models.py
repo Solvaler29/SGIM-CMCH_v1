@@ -69,6 +69,12 @@ class Ticket(models.Model):
         related_name='tickets',
         verbose_name='Equipo relacionado (identificado por QR)',
     )
+    fotografia = models.ImageField(
+        upload_to='evidencias/%Y/%m/',
+        blank=True,
+        null=True,
+        verbose_name='Fotografía de evidencia',
+    )
     estado = models.CharField(max_length=30, choices=ESTADOS, default='registrada')
     prioridad = models.CharField(max_length=10, choices=PRIORIDADES, default='media')
 
@@ -96,6 +102,29 @@ class Ticket(models.Model):
             models.Index(fields=['solicitante']),
             models.Index(fields=['created_at']),
         ]
+
+    def __str__(self):
+        return f'{self.codigo_ticket} - {self.estado}'
+
+    def save(self, *args, **kwargs):
+        if not self.codigo_ticket:
+            from django.utils import timezone
+            hoy = timezone.now().strftime('%Y%m%d')
+            ultimo = Ticket.objects.filter(
+                codigo_ticket__startswith=f'TIK-{hoy}-'
+            ).order_by('-codigo_ticket').first()
+            if ultimo:
+                try:
+                    num = int(ultimo.codigo_ticket.split('-')[-1]) + 1
+                except (ValueError, IndexError):
+                    num = 1
+            else:
+                num = 1
+            self.codigo_ticket = f'TIK-{hoy}-{num:04d}'
+        super().save(*args, **kwargs)
+
+    def puede_ser_visto_por(self, usuario):
+        return usuario.puede_ver_ticket(self)
 
 
 
@@ -188,25 +217,3 @@ class Satisfaccion(models.Model):
 
     def __str__(self):
         return f'Encuesta {self.ticket.codigo_ticket} - {self.puntuacion}'
-    def __str__(self):
-        return f'{self.codigo_ticket} - {self.estado}'
-
-    def save(self, *args, **kwargs):
-        if not self.codigo_ticket:
-            from django.utils import timezone
-            hoy = timezone.now().strftime('%Y%m%d')
-            ultimo = Ticket.objects.filter(
-                codigo_ticket__startswith=f'TIK-{hoy}-'
-            ).order_by('-codigo_ticket').first()
-            if ultimo:
-                try:
-                    num = int(ultimo.codigo_ticket.split('-')[-1]) + 1
-                except (ValueError, IndexError):
-                    num = 1
-            else:
-                num = 1
-            self.codigo_ticket = f'TIK-{hoy}-{num:04d}'
-        super().save(*args, **kwargs)
-
-    def puede_ser_visto_por(self, usuario):
-        return usuario.puede_ver_ticket(self)

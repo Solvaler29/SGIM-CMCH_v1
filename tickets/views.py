@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Q
+from equipment.models import Equipment
 from .models import Ticket, TicketEvent, TicketAssignment
 from .forms import TicketForm
 from core.models import Servicio, AreaProblema
@@ -14,9 +16,9 @@ def lista_tickets(request):
     if user.tiene_rol('administrador'):
         tickets = Ticket.objects.all()
     elif user.tiene_rol('supervisor'):
-        tickets = Ticket.objects.filter(area_soporte__in=user.areas.all())
+        tickets = Ticket.objects.filter(Q(area_soporte__in=user.areas.all()) | Q(solicitante=user)).distinct()
     elif user.tiene_rol('tecnico'):
-        tickets = Ticket.objects.filter(asignaciones__tecnico=user, asignaciones__activo=True)
+        tickets = Ticket.objects.filter(Q(asignaciones__tecnico=user, asignaciones__activo=True) | Q(solicitante=user)).distinct()
     else:
         tickets = Ticket.objects.filter(solicitante=user)
     tickets = tickets.order_by('-created_at')
@@ -42,12 +44,25 @@ def registrar_ticket(request):
             return redirect('tickets:detalle_ticket', pk=ticket.pk)
     else:
         form = TicketForm(solicitante=request.user)
-    return render(request, 'tickets/registrar_ticket.html', {'form': form})
+    equipos_demo = Equipment.objects.all()[:20]
+    return render(request, 'tickets/registrar_ticket.html', {'form': form, 'equipos_demo': equipos_demo})
 
 
 @login_required
 def detalle_ticket(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
+    if not ticket.puede_ser_visto_por(request.user):
+        messages.error(request, 'No tienes permiso para ver este ticket.')
+        return redirect('tickets:lista_tickets')
+    eventos = ticket.eventos.all()
+    asignaciones = ticket.asignaciones.all().order_by('-fecha_asignacion')
+    asignacion_vigente = ticket.asignaciones.filter(activo=True).first()
+    return render(request, 'tickets/detalle_ticket.html', {
+        'ticket': ticket,
+        'eventos': eventos,
+        'asignaciones': asignaciones,
+        'asignacion_vigente': asignacion_vigente,
+    })
 
 
 @login_required
@@ -115,6 +130,14 @@ def asignar_tecnico(request, pk):
             tecnico=tecnico,
             asignado_por=request.user,
         )
+        scheduled_at_str = request.POST.get('scheduled_at')
+        if scheduled_at_str:
+            from django.utils.dateparse import parse_datetime
+            dt = parse_datetime(scheduled_at_str)
+            if dt:
+                if timezone.is_naive(dt):
+                    dt = timezone.make_aware(dt)
+                ticket.scheduled_at = dt
         ticket.estado = 'asignada'
         ticket.save()
         TicketEvent.objects.create(
@@ -127,12 +150,4 @@ def asignar_tecnico(request, pk):
         return redirect('tickets:detalle_ticket', pk=pk)
     return render(request, 'tickets/asignar_tecnico.html', {
         'ticket': ticket, 'tecnicos': tecnicos
-    })
-    if not ticket.puede_ser_visto_por(request.user):
-        messages.error(request, 'No tienes permiso para ver este ticket.')
-        return redirect('tickets:lista_tickets')
-    eventos = ticket.eventos.all()
-    asignaciones = ticket.asignaciones.all().order_by('-fecha_asignacion')
-    return render(request, 'tickets/detalle_ticket.html', {
-        'ticket': ticket, 'eventos': eventos, 'asignaciones': asignaciones
     })

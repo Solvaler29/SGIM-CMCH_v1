@@ -1,72 +1,126 @@
 {% extends 'base.html' %}
-{% block title %}Reportes - SGIM-CMCH{% endblock %}
-{% block content %}
-<h2><i class="fas fa-chart-bar me-2 text-primary"></i>Panel de Reportes</h2>
-<p class="text-muted">Todos los indicadores se calculan a partir de registros reales en PostgreSQL.</p>
+{% block title %}Reportes & KPIs - SGIM-CMCH{% endblock %}
 
-<div class="row mb-4">
-    <div class="col-md-3 mb-3"><div class="card bg-primary text-white"><div class="card-body"><h5>Pendientes</h5><p class="display-4">{{ pendientes }}</p></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card bg-info text-white"><div class="card-body"><h5>En Atención</h5><p class="display-4">{{ en_atencion }}</p></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card bg-warning text-white"><div class="card-body"><h5>Pendiente Validación</h5><p class="display-4">{{ pendiente_validacion }}</p></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card bg-success text-white"><div class="card-body"><h5>Cerrados</h5><p class="display-4">{{ cerradas }}</p></div></div></div>
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-1">
+            <i class="fas fa-chart-line me-1"></i> Indicadores Hospitalarios
+        </span>
+        <h2 class="fw-bold text-dark mb-0">
+            <i class="fas fa-chart-pie text-danger me-2"></i>Panel de KPIs y Métricas de Rendimiento
+        </h2>
+        <p class="text-muted small mb-0 mt-1">Evaluación de tiempos de atención, incidencias por servicio y satisfacción de los usuarios.</p>
+    </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-light"><strong>Tickets por Mes</strong></div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    {% for m in meses %}
-                    <li class="list-group-item d-flex justify-content-between">{{ m.mes }} <span class="badge bg-primary">{{ m.cantidad }}</span></li>
-                    {% empty %}
-                    <li class="list-group-item text-center text-muted">Sin datos</li>
-                    {% endfor %}
-                </ul>
+<!-- Tarjetas Principales de Estado -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card-cmch total">
+            <div class="stat-icon"><i class="fas fa-inbox"></i></div>
+            <div>
+                <div class="stat-value text-danger">{{ pendientes }}</div>
+                <div class="stat-label">Pendientes de Asignar</div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-header bg-light"><strong>Por Servicio</strong></div>
-            <div class="card-body">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card-cmch en-atencion">
+            <div class="stat-icon"><i class="fas fa-wrench"></i></div>
+            <div>
+                <div class="stat-value text-primary">{{ en_atencion }}</div>
+                <div class="stat-label">En Atención Técnica</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card-cmch pendientes">
+            <div class="stat-icon"><i class="fas fa-clipboard-question"></i></div>
+            <div>
+                <div class="stat-value text-warning">{{ pendiente_validacion }}</div>
+                <div class="stat-label">Por Validar / Conformidad</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card-cmch cerrados">
+            <div class="stat-icon"><i class="fas fa-check-double"></i></div>
+            <div>
+                <div class="stat-value text-success">{{ cerradas }}</div>
+                <div class="stat-label">Cerradas Técnicamente</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tiempos de Respuesta y Satisfacción (KPIs) -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card-cmch text-center p-4">
+            <div class="text-danger mb-2 fs-2"><i class="fas fa-hourglass-start"></i></div>
+            <div class="display-5 fw-bold text-dark">{{ tiempo_respuesta_horas }} <small class="fs-6 text-muted">hrs</small></div>
+            <h6 class="fw-bold text-dark mt-2 mb-1">Tiempo Medio de Respuesta</h6>
+            <small class="text-muted">Promedio transcurrido entre el reporte y la asignación del técnico</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-cmch text-center p-4">
+            <div class="text-primary mb-2 fs-2"><i class="fas fa-stopwatch"></i></div>
+            <div class="display-5 fw-bold text-dark">{{ tiempo_solucion_horas }} <small class="fs-6 text-muted">hrs</small></div>
+            <h6 class="fw-bold text-dark mt-2 mb-1">Tiempo Medio de Solución (MTTR)</h6>
+            <small class="text-muted">Promedio transcurrido entre el reporte y el cierre técnico validado</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-cmch text-center p-4">
+            <div class="text-warning mb-2 fs-2"><i class="fas fa-star"></i></div>
+            <div class="display-5 fw-bold text-dark">{{ satisfaccion_promedio|default:"5.0" }} <small class="fs-6 text-muted">/ 5</small></div>
+            <h6 class="fw-bold text-dark mt-2 mb-1">Satisfacción del Personal</h6>
+            <small class="text-muted">Calificación promedio otorgada por los solicitantes asistenciales</small>
+        </div>
+    </div>
+</div>
+
+<!-- Desglose por Servicio y Mes -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card-cmch">
+            <div class="card-header header-red d-flex align-items-center gap-2">
+                <i class="fas fa-hospital-user text-warning"></i>
+                <span>Incidencias por Servicio Asistencial</span>
+            </div>
+            <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
                     {% for s in por_servicio %}
-                    <li class="list-group-item d-flex justify-content-between">{{ s.servicio__nombre }} <span class="badge bg-info">{{ s.total }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <span class="fw-semibold text-dark">{{ s.servicio__nombre }}</span>
+                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold">{{ s.total }} tickets</span>
+                    </li>
                     {% empty %}
-                    <li class="list-group-item text-center text-muted">Sin datos</li>
+                    <li class="list-group-item text-center py-4 text-muted">Sin datos de servicios aún.</li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5>Tiempo de Respuesta</h5>
-                <p class="display-4">{{ tiempo_respuesta_horas }} h</p>
-                <small class="text-muted">Promedio: creado → asignado</small>
+    <div class="col-lg-6">
+        <div class="card-cmch">
+            <div class="card-header header-red d-flex align-items-center gap-2">
+                <i class="fas fa-calendar-alt text-warning"></i>
+                <span>Evolución Mensual de Incidencias</span>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5>Tiempo de Solución</h5>
-                <p class="display-4">{{ tiempo_solucion_horas }} h</p>
-                <small class="text-muted">Promedio: creado → cerrado</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5>Satisfacción Promedio</h5>
-                <p class="display-4">{{ satisfaccion_promedio|default:"--" }}</p>
-                <small class="text-muted">Escala numérica</small>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for m in meses %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <span class="fw-semibold text-dark"><i class="far fa-calendar me-2 text-danger"></i>{{ m.mes }}</span>
+                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-bold">{{ m.cantidad }} tickets</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-center py-4 text-muted">Sin datos históricos aún.</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>

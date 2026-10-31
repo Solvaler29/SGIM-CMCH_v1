@@ -16,28 +16,39 @@ class TicketForm(forms.ModelForm):
             'descripcion', 'acciones_previas', 'equipo', 'fotografia',
         ]
         widgets = {
-            'servicio': forms.Select(attrs={'class': 'form-select'}),
-            'area_problema': forms.Select(attrs={'class': 'form-select'}),
-            'area_soporte': forms.Select(attrs={'class': 'form-select'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'acciones_previas': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'equipo': forms.Select(attrs={'class': 'form-select'}),
+            'servicio': forms.Select(attrs={'class': 'form-select form-select-cmch'}),
+            'area_problema': forms.Select(attrs={'class': 'form-select form-select-cmch'}),
+            'area_soporte': forms.Select(attrs={'class': 'form-select form-select-cmch'}),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control form-control-cmch',
+                'rows': 4,
+                'placeholder': 'Explica con claridad qué falla o qué está roto. Ej: La camilla tiene una rueda trabada y la baranda lateral derecha no sube...',
+            }),
+            'acciones_previas': forms.Textarea(attrs={
+                'class': 'form-control form-control-cmch',
+                'rows': 2,
+                'placeholder': 'Opcional. Ej: Se desconectó el equipo y se colocó aviso de precaución...',
+            }),
+            'equipo': forms.Select(attrs={'class': 'form-select form-select-cmch', 'id': 'id_equipo'}),
         }
 
     fotografia = forms.ImageField(
         required=True,
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control form-control-cmch', 'accept': 'image/*'}),
         help_text='Adjunta al menos una fotografía del problema.',
     )
 
     def __init__(self, *args, solicitante=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['servicio'].queryset = Servicio.objects.filter(activo=True)
+        self.fields['servicio'].empty_label = '-- Selecciona el Servicio / Piso donde ocurrió --'
         self.fields['area_problema'].queryset = AreaProblema.objects.filter(activo=True)
+        self.fields['area_problema'].empty_label = '-- Selecciona el tipo de objeto / problema --'
         self.fields['area_soporte'].queryset = Area.objects.filter(activa=True)
+        self.fields['area_soporte'].empty_label = '-- ¿A qué área va dirigida la atención? --'
         self.fields['equipo'].queryset = Equipment.objects.all()
         self.fields['equipo'].required = False
-        self.fields['equipo'].empty_label = 'Seleccionar equipo (opcional, identificar por QR)'
+        self.fields['equipo'].empty_label = '-- Ninguno / No aplica equipo biomédico con QR --'
 
     def clean_fotografia(self):
         foto = self.cleaned_data.get('fotografia')
@@ -48,6 +59,6 @@ class TicketForm(forms.ModelForm):
             raise ValidationError('La fotografía no debe superar los 5 MB.')
         # Validar extensión
         ext = foto.name.lower().split('.')[-1] if '.' in foto.name else ''
-        if ext not in ('jpg', 'jpeg', 'png', 'webp'):
-            raise ValidationError('Solo se permiten imágenes JPG, JPEG, PNG o WEBP.')
+        if ext not in ('jpg', 'jpeg', 'png', 'webp', 'gif'):
+            raise ValidationError('Solo se permiten imágenes JPG, JPEG, PNG, WEBP o GIF.')
         return foto

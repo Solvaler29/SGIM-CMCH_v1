@@ -1,47 +1,432 @@
-/* SGIM-CMCH - Estilos personalizados */
+/* ==========================================================================
+   SGIM-CMCH: Sistema de Gestión de Incidencias y Mantenimiento Hospitalario
+   Paleta Institucional: Rojo Clínico, Amarillo Dorado y Blanco Puro
+   Diseño: Limpio, Médico, Estético y 100% Responsivo
+   ========================================================================== */
+
+:root {
+    --cmch-red: #B71C1C;
+    --cmch-red-dark: #880E4F;
+    --cmch-red-hover: #991B1B;
+    --cmch-red-soft: #FEE2E2;
+    --cmch-yellow: #F59E0B;
+    --cmch-yellow-hover: #D97706;
+    --cmch-yellow-soft: #FEF3C7;
+    --cmch-white: #FFFFFF;
+    --cmch-bg: #F8FAFC;
+    --cmch-card-bg: #FFFFFF;
+    --cmch-text: #1E293B;
+    --cmch-text-muted: #64748B;
+    --cmch-border: #E2E8F0;
+    --cmch-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --cmch-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --cmch-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
 body {
-    padding-bottom: 60px;
+    background-color: var(--cmch-bg);
+    color: var(--cmch-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.navbar-brand {
-    font-weight: bold;
+main.main-content {
+    flex: 1;
+}
+
+/* ==========================================================================
+   Navbar Institucional
+   ========================================================================== */
+.navbar-cmch {
+    background: linear-gradient(135deg, #B71C1C 0%, #D32F2F 75%, #C62828 100%);
+    box-shadow: 0 2px 8px rgba(183, 28, 28, 0.2);
+    padding: 0.6rem 1rem;
+    border-bottom: 3px solid var(--cmch-yellow);
+}
+
+.navbar-cmch .navbar-brand {
+    font-weight: 800;
     font-size: 1.25rem;
+    color: var(--cmch-white) !important;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
 }
 
-.card {
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
+.navbar-cmch .navbar-brand .hospital-badge {
+    background-color: var(--cmch-yellow);
+    color: #78350F;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.card-header {
-    border-radius: 8px 8px 0 0 !important;
-}
-
-.badge {
-    font-size: 0.85rem;
-    padding: 0.5em 0.75em;
-}
-
-.form-control, .form-select {
+.navbar-cmch .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.45rem 0.8rem !important;
     border-radius: 6px;
+    transition: all 0.2s ease-in-out;
 }
 
-.btn {
-    border-radius: 6px;
+.navbar-cmch .nav-link:hover,
+.navbar-cmch .nav-link.active {
+    color: var(--cmch-white) !important;
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
-.alert-dismissible {
-    border-radius: 8px;
+/* Botón Destacado en Navbar */
+.btn-nav-reportar {
+    background-color: var(--cmch-yellow) !important;
+    color: #1E293B !important;
+    font-weight: 700 !important;
+    font-size: 0.88rem !important;
+    border: none !important;
+    border-radius: 30px !important;
+    padding: 0.45rem 1.1rem !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.table {
+.btn-nav-reportar:hover {
+    background-color: var(--cmch-yellow-hover) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Hero Banner de Bienvenida Institucional (Diseño Favorito del Usuario)
+   ========================================================================== */
+.hero-banner-cmch {
+    background: linear-gradient(135deg, #B71C1C 0%, #D32F2F 60%, #E53935 100%);
+    border-radius: 16px;
+    color: var(--cmch-white);
+    padding: 1.85rem 2.25rem;
+    box-shadow: var(--cmch-shadow-lg);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-banner-cmch::after {
+    content: "\f0f8";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: -20px;
+    bottom: -35px;
+    font-size: 11rem;
+    opacity: 0.08;
+    color: #FFFFFF;
+    pointer-events: none;
+}
+
+.hero-btn-reportar {
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    color: #1E293B !important;
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 0.8rem 1.8rem;
+    border-radius: 50px;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease-in-out;
+    text-decoration: none;
+}
+
+.hero-btn-reportar:hover {
+    background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+    color: #FFFFFF !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* ==========================================================================
+   Tarjetas de Estadísticas Clínicas (Compactas y Estéticas)
+   ========================================================================== */
+.stat-card-cmch {
+    background-color: var(--cmch-card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--cmch-border);
+    box-shadow: var(--cmch-shadow-sm);
+    padding: 1rem 1.15rem;
+    transition: all 0.2s ease-in-out;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.stat-card-cmch:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cmch-shadow);
+}
+
+.stat-card-cmch .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.stat-card-cmch.total .stat-icon {
+    background-color: #FEE2E2;
+    color: #B71C1C;
+}
+
+.stat-card-cmch.pendientes .stat-icon {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.stat-card-cmch.en-atencion .stat-icon {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.stat-card-cmch.cerrados .stat-icon {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.stat-card-cmch .stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--cmch-text);
+}
+
+.stat-card-cmch .stat-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--cmch-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 0.15rem;
+}
+
+/* ==========================================================================
+   Tarjetas y Paneles
+   ========================================================================== */
+.card-cmch {
+    background-color: var(--cmch-card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--cmch-border);
+    box-shadow: var(--cmch-shadow-sm);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+}
+
+.card-cmch .card-header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #F1F5F9;
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.98rem;
+    color: var(--cmch-text);
+}
+
+.card-cmch .card-header.header-red {
+    background: linear-gradient(135deg, #B71C1C 0%, #D32F2F 100%);
+    color: #FFFFFF;
+    border-bottom: 2px solid var(--cmch-yellow);
+}
+
+.card-cmch .card-header.header-yellow {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #78350F;
+    border-bottom: 2px solid #F59E0B;
+}
+
+/* ==========================================================================
+   Tablas Estilizadas y Responsivas
+   ========================================================================== */
+.table-cmch {
+    margin-bottom: 0;
+}
+
+.table-cmch thead th {
+    background-color: #F8FAFC;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--cmch-border);
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+.table-cmch tbody td {
+    padding: 0.8rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 0.88rem;
+}
+
+.table-cmch tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+.badge-cmch {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35em 0.75em;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+}
+
+/* ==========================================================================
+   Formularios
+   ========================================================================== */
+.form-label-cmch {
+    font-weight: 700;
+    color: #334155;
     font-size: 0.9rem;
+    margin-bottom: 0.35rem;
 }
 
-footer {
+.form-control-cmch,
+.form-select-cmch {
+    border: 1.5px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.92rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control-cmch:focus,
+.form-select-cmch:focus {
+    border-color: var(--cmch-red);
+    box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.12);
+}
+
+/* ==========================================================================
+   Botones
+   ========================================================================== */
+.btn-cmch-red {
+    background: linear-gradient(135deg, #B71C1C 0%, #D32F2F 100%);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.25rem;
+    box-shadow: 0 2px 4px rgba(183, 28, 28, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cmch-red:hover {
+    background: linear-gradient(135deg, #991B1B 0%, #B71C1C 100%);
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(183, 28, 28, 0.3);
+}
+
+.btn-cmch-yellow {
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+    color: #1E293B !important;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.25rem;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cmch-yellow:hover {
+    background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer-cmch {
+    background-color: #FFFFFF;
+    border-top: 3px solid var(--cmch-red);
+    color: var(--cmch-text-muted);
+    padding: 1.25rem 0;
+    margin-top: auto;
     font-size: 0.85rem;
 }
 
-#resultadoQR {
-    max-width: 100%;
+/* ==========================================================================
+   Reglas de Responsividad (Mobile & Tablet)
+   ========================================================================== */
+@media (max-width: 991px) {
+    .navbar-cmch .navbar-collapse {
+        background-color: #991B1B;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-banner-cmch {
+        padding: 1.35rem 1.25rem;
+    }
+
+    .hero-banner-cmch h2 {
+        font-size: 1.3rem;
+    }
+
+    .hero-btn-reportar {
+        width: 100%;
+        justify-content: center;
+        padding: 0.65rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    .stat-card-cmch {
+        padding: 0.75rem 0.85rem;
+    }
+
+    .stat-card-cmch .stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        margin-right: 0.65rem;
+    }
+
+    .stat-card-cmch .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .stat-card-cmch .stat-label {
+        font-size: 0.65rem;
+    }
+
+    .table-cmch th, .table-cmch td {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stat-card-cmch .stat-value {
+        font-size: 1.25rem;
+    }
 }

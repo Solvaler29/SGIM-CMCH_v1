@@ -1,28 +1,55 @@
 {% extends 'base.html' %}
 {% block title %}Iniciar Sesión - SGIM-CMCH{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión</h4>
+<div class="row justify-content-center py-4">
+    <div class="col-md-7 col-lg-5 col-xl-4">
+        <!-- Tarjeta de Login Institucional -->
+        <div class="card-cmch shadow-lg border-0">
+            <div class="card-header header-red text-center py-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-white text-danger rounded-circle p-3 mb-2 shadow-sm" style="width: 64px; height: 64px;">
+                    <i class="fas fa-heart-pulse fs-2"></i>
+                </div>
+                <h4 class="fw-bold mb-0 text-white">Clínica Médica CMCH</h4>
+                <div class="small text-warning fw-semibold mt-1">Portal de Gestión e Incidencias</div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+
                     <div class="mb-3">
-                        <label class="form-label">{{ form.username.label }}</label>
+                        <label class="form-label-cmch"><i class="fas fa-user text-danger me-1"></i> Usuario del Sistema</label>
                         {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.password.label }}</label>
+
+                    <div class="mb-4">
+                        <label class="form-label-cmch"><i class="fas fa-lock text-danger me-1"></i> Contraseña</label>
                         {{ form.password }}
+                        {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+
+                    <button type="submit" class="btn btn-cmch-red w-100 py-3 fw-bold rounded-pill shadow-sm fs-6">
+                        <i class="fas fa-sign-in-alt me-2"></i> Ingresar a la Plataforma
+                    </button>
                 </form>
             </div>
+            <div class="card-footer bg-light border-top p-3 text-center">
+                <div class="small fw-semibold text-dark mb-2">Cuentas de demostración disponibles:</div>
+                <div class="d-flex flex-wrap justify-content-center gap-1">
+                    <span class="badge bg-white text-danger border p-2 small">Jefa Enfermería: <code>lic_martinez</code></span>
+                    <span class="badge bg-white text-danger border p-2 small">Supervisor Mant.: <code>sup_man</code></span>
+                    <span class="badge bg-white text-danger border p-2 small">Técnico: <code>tec_infra</code></span>
+                </div>
+                <div class="small text-muted mt-2">Contraseña para todas: <code>clinica123</code></div>
+            </div>
         </div>
-        <p class="text-center mt-3 text-muted small">¿No tienes cuenta? Contacta al administrador del sistema.</p>
     </div>
 </div>
 {% endblock %}

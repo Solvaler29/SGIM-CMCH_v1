@@ -4,78 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SGIM-CMCH{% endblock %}</title>
+    <title>{% block title %}SGIM-CMCH - Clínica Médica{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Font: Inter / Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Estilos Institucionales CMCH -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
+    <!-- Navbar Institucional (Rojo Clínico y Acentos Amarillo Dorado) -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-cmch sticky-top">
+        <div class="container-fluid px-3 px-lg-4">
             <a class="navbar-brand" href="{% url 'core:dashboard' %}">
-                <i class="fas fa-hospital me-2"></i>SGIM-CMCH
+                <i class="fas fa-heart-pulse me-2 text-warning fs-5"></i>
+                <span>CMCH</span>
+                <span class="hospital-badge">Gestión Clínica</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            
+            <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+            
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
                     {% if user.is_authenticated %}
-                        {% if user.tiene_rol == 'solicitante' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:registrar_ticket' %}"><i class="fas fa-plus me-1"></i>Nueva Incidencia</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:lista_tickets' %}"><i class="fas fa-list me-1"></i>Mis Tickets</a></li>
-                        {% elif user.tiene_rol == 'supervisor' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'tickets:lista_tickets' %}"><i class="fas fa-list me-1"></i>Bandeja del Área</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'reports:dashboard_reportes' %}"><i class="fas fa-chart-bar me-1"></i>Reportes</a></li>
-                        {% elif user.tiene_rol == 'tecnico' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'maintenance:lista_atenciones' %}"><i class="fas fa-tools me-1"></i>Mis Atenciones</a></li>
-                        {% elif user.tiene_rol == 'administrador' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts:usuarios_list' %}"><i class="fas fa-users me-1"></i>Usuarios</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'reports:dashboard_reportes' %}"><i class="fas fa-chart-bar me-1"></i>Reportes</a></li>
-                        {% endif %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'equipment:lista_equipos' %}"><i class="fas fa-qrcode me-1"></i>Equipos QR</a></li>
-                    {% endif %}
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ user.get_full_name|default:user.username }}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'core:dashboard' %}">
+                                <i class="fas fa-home me-1 text-warning opacity-75"></i> Inicio
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{% url 'accounts:perfil' %}">Perfil</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Cerrar sesión</a></li>
-                            </ul>
                         </li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Iniciar sesión</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'tickets:lista_tickets' %}">
+                                <i class="fas fa-clipboard-list me-1 text-warning opacity-75"></i> 
+                                {% if user.roles == 'supervisor' %}Bandeja del Área{% elif user.roles == 'tecnico' %}Mis Tareas{% else %}Mis Tickets{% endif %}
+                            </a>
+                        </li>
+                        {% if user.roles == 'tecnico' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'maintenance:lista_atenciones' %}">
+                                <i class="fas fa-tools me-1 text-warning opacity-75"></i> Atenciones
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'equipment:lista_equipos' %}">
+                                <i class="fas fa-qrcode me-1 text-warning opacity-75"></i> Catálogo QR
+                            </a>
+                        </li>
+                        {% if user.roles == 'supervisor' or user.roles == 'administrador' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:dashboard_reportes' %}">
+                                <i class="fas fa-chart-pie me-1 text-warning opacity-75"></i> Reportes
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if user.roles == 'administrador' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:usuarios_list' %}">
+                                <i class="fas fa-users-cog me-1 text-warning opacity-75"></i> Usuarios
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item d-lg-none mt-2 pt-2 border-top border-white border-opacity-10">
+                            <a class="btn btn-warning text-dark fw-bold w-100 rounded-pill py-2 shadow-sm" href="{% url 'tickets:registrar_ticket' %}">
+                                <i class="fas fa-plus-circle text-danger me-1"></i> Reportar Incidencia
+                            </a>
+                        </li>
                     {% endif %}
                 </ul>
+                
+                <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                    {% if user.is_authenticated %}
+                        <!-- Botón Navbar para pantallas medianas y grandes -->
+                        <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-nav-reportar d-none d-sm-inline-flex">
+                            <i class="fas fa-plus-circle text-danger"></i>
+                            <span>Reportar Incidencia</span>
+                        </a>
+
+                        <!-- Perfil y Menú de Usuario -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle border-0 d-flex align-items-center gap-2 px-2.5 py-1.5 rounded-pill bg-white bg-opacity-10" type="button" data-bs-toggle="dropdown">
+                                <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 26px; height: 26px; font-size: 0.8rem;">
+                                    {{ user.first_name|default:user.username|slice:":1"|upper }}
+                                </div>
+                                <span class="d-none d-md-inline fw-semibold text-white small">{{ user.get_full_name|default:user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3">
+                                <li class="px-3 py-2 border-bottom bg-light">
+                                    <div class="fw-bold text-dark small">{{ user.get_full_name|default:user.username }}</div>
+                                    <span class="badge bg-danger text-white rounded-pill" style="font-size: 0.7rem;">{{ user.get_roles_display }}</span>
+                                </li>
+                                <li><a class="dropdown-item py-2 small" href="{% url 'accounts:perfil' %}"><i class="fas fa-id-badge me-2 text-danger"></i> Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><a class="dropdown-item py-2 text-danger fw-semibold small" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-light fw-bold text-danger px-3 py-1.5 rounded-pill shadow-sm small">
+                            <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- Contenedor Principal -->
+    <main class="main-content py-3 py-md-4">
+        <div class="container-fluid px-3 px-lg-4">
+            <!-- Mensajes del Sistema -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-3 mb-3 d-flex align-items-center py-2 px-3 small" role="alert">
+                        <i class="fas fa-info-circle me-2 fs-6"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer Institucional -->
+    <footer class="footer-cmch">
+        <div class="container-fluid px-3 px-lg-4 text-center">
+            <div class="row align-items-center gy-2">
+                <div class="col-md-6 text-md-start small">
+                    <span class="fw-bold text-danger"><i class="fas fa-hospital me-1"></i> Clínica Médica CMCH</span> — Sistema de Gestión de Incidencias
                 </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}{% endblock %}
-    </div>
-
-    <footer class="mt-5 py-4 bg-light text-muted border-top">
-        <div class="container text-center">
-            <p class="mb-0">SGIM-CMCH - Sistema de Gestión de Incidencias y Mantenimiento del CMCH</p>
-            <p class="mb-0 small">Versión MVP - Datos ficticios para demostración</p>
+                <div class="col-md-6 text-md-end text-muted small">
+                    <span class="badge bg-warning text-dark me-1" style="font-size: 0.68rem;">24/7</span> TI • Ing. Clínica • Mantenimiento
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>

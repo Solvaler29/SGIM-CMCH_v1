@@ -68,6 +68,22 @@ class User(AbstractUser):
     def tiene_rol(self, rol):
         return self.roles == rol
 
+    @property
+    def es_supervisor(self):
+        return self.roles in ('supervisor', 'administrador')
+
+    @property
+    def es_tecnico(self):
+        return self.roles == 'tecnico'
+
+    @property
+    def es_administrador(self):
+        return self.roles == 'administrador'
+
+    @property
+    def es_solicitante(self):
+        return self.roles == 'solicitante' 
+
     def pertenece_area(self, area):
         if isinstance(area, Area):
             return self.areas.filter(pk=area.pk).exists()
@@ -82,11 +98,9 @@ class User(AbstractUser):
         return False
 
     def puede_ver_ticket(self, ticket):
-        """Restricción de acceso por área y asignación."""
-        if self.tiene_rol('administrador'):
+        """Restricción de acceso por área y asignación. El creador siempre puede verlo."""
+        if self.tiene_rol('administrador') or ticket.solicitante_id == self.pk:
             return True
-        if self.tiene_rol('solicitante'):
-            return ticket.solicitante_id == self.pk
         if self.tiene_rol('supervisor'):
             return ticket.area_soporte_id in list(self.areas.values_list('pk', flat=True))
         if self.tiene_rol('tecnico'):

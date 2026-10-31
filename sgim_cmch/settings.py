@@ -58,7 +58,10 @@ TEMPLATES = [
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
-	    'libraries': {
+            'builtins': [
+                'templatetags.sgim_filters',
+            ],
+            'libraries': {
                 'sgim_filters': 'templatetags.sgim_filters',
             },
             'context_processors': [
@@ -83,16 +86,24 @@ WSGI_APPLICATION = 'sgim_cmch.wsgi.application'
 # DATABASES configurado para PostgreSQL (ver .env)
 # Para generar migraciones sin PostgreSQL, cambiar temporalmente a:
 # 'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3',
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'sgim_cmch'),
-        'USER': os.getenv('DB_USER', 'sgim_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+if os.getenv('DB_ENGINE') == 'sqlite3' or os.getenv('USE_SQLITE', 'false').lower() in ('true', '1', 'yes'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'sgim_cmch'),
+            'USER': os.getenv('DB_USER', 'sgim_user'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 # Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [

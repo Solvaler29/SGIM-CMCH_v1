@@ -43,6 +43,8 @@ def iniciar_atencion(request, ticket_pk):
         usuario=request.user,
         detalles='Técnico inició la atención real del trabajo.',
     )
+    messages.success(request, 'Atención iniciada. Fecha y hora registradas en el servidor.')
+    return redirect('tickets:detalle_ticket', pk=ticket_pk)
 
 
 @login_required
@@ -135,5 +137,3 @@ def revisar_atencion(request, ticket_pk):
     return render(request, 'maintenance/revisar_atencion.html', {
         'ticket': ticket, 'atencion': atencion
     })
-    messages.success(request, 'Atención iniciada. Fecha y hora registradas en el servidor.')
-    return redirect('tickets:detalle_ticket', pk=ticket_pk)

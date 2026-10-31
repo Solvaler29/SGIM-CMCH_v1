@@ -5,48 +5,42 @@ from django.db.models import Count, Q
 
 @login_required
 def dashboard(request):
-    """Panel principal según el rol del usuario."""
+    """Panel principal adaptado al rol del usuario."""
     user = request.user
     context = {'usuario': user}
     context['es_administrador'] = user.tiene_rol('administrador')
-    context['total_tickets'] = 0
-    context['pendientes'] = 0
-    context['en_atencion'] = 0
-    context['cerrados'] = 0
 
     if user.tiene_rol('solicitante'):
-        tickets = Ticket.objects.filter(solicitante=user).order_by('-created_at')[:10]
-        context['tickets'] = tickets
-        context['titulo'] = 'Mis Incidencias'
+        tickets_qs = Ticket.objects.filter(solicitante=user)
+        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
+        context['titulo'] = 'Mis Incidencias Reportadas'
     elif user.tiene_rol('supervisor'):
         areas = user.areas.all()
-        tickets = Ticket.objects.filter(area_soporte__in=areas).order_by('-created_at')[:10]
-        context['tickets'] = tickets
+        tickets_qs = Ticket.objects.filter(Q(area_soporte__in=areas) | Q(solicitante=user)).distinct()
+        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
         context['areas'] = areas
-        context['titulo'] = 'Bandeja del Área'
+        context['titulo'] = 'Bandeja del Área Asignada'
     elif user.tiene_rol('tecnico'):
-        asignaciones = user.asignaciones_tecnico.filter(activo=True)
-        tickets = [a.ticket for a in asignaciones]
-        context['tickets'] = tickets
-        context['titulo'] = 'Mis Tareas Asignadas'
+        tickets_qs = Ticket.objects.filter(Q(asignaciones__tecnico=user, asignaciones__activo=True) | Q(solicitante=user)).distinct()
+        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
+        context['titulo'] = 'Mis Tareas y Atenciones'
     else:  # administrador
-        tickets = Ticket.objects.all().order_by('-created_at')[:10]
-        context['tickets'] = tickets
-        context['titulo'] = 'Panel de Administración'
+        tickets_qs = Ticket.objects.all()
+        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
+        context['titulo'] = 'Panel de Control Hospitalario'
 
-
-    estadisticas = Ticket.objects.aggregate(
+    estadisticas = tickets_qs.aggregate(
         total=Count('id'),
-        pendientes=Count('id', filter=Q(estado='registrada')),
-        en_atencion=Count('id', filter=Q(estado='en_atencion')),
+        pendientes=Count('id', filter=Q(estado__in=['registrada', 'revision'])),
+        en_atencion=Count('id', filter=Q(estado__in=['asignada', 'en_atencion', 'pendiente_validacion'])),
         cerrados=Count('id', filter=Q(estado='cerrada_tecnicamente')),
     )
 
     context.update({
-        'total_tickets': estadisticas['total'],
-        'pendientes': estadisticas['pendientes'],
-        'en_atencion': estadisticas['en_atencion'],
-        'cerrados': estadisticas['cerrados'],
+        'total_tickets': estadisticas['total'] or 0,
+        'pendientes': estadisticas['pendientes'] or 0,
+        'en_atencion': estadisticas['en_atencion'] or 0,
+        'cerrados': estadisticas['cerrados'] or 0,
     })
 
     return render(request, 'core/dashboard.html', context)
