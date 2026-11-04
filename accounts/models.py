@@ -51,6 +51,8 @@ class User(AbstractUser):
     )
     telefono = models.CharField(max_length=20, blank=True)
     correo_notificaciones = models.EmailField(blank=True)
+    # Legado conservado para no destruir datos. Desde AUD-005 la habilitación
+    # se administra exclusivamente mediante AbstractUser.is_active.
     activo_sistema = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -91,18 +93,10 @@ class User(AbstractUser):
 
     def puede_gestionar_area(self, area):
         """Un supervisor puede gestionar solo las áreas que tiene asignadas."""
-        if self.tiene_rol('administrador'):
-            return True
-        if self.tiene_rol('supervisor'):
-            return self.pertenece_area(area)
-        return False
+        from tickets.permissions import puede_gestionar_area
+        return puede_gestionar_area(self, area)
 
     def puede_ver_ticket(self, ticket):
         """Restricción de acceso por área y asignación. El creador siempre puede verlo."""
-        if self.tiene_rol('administrador') or ticket.solicitante_id == self.pk:
-            return True
-        if self.tiene_rol('supervisor'):
-            return ticket.area_soporte_id in list(self.areas.values_list('pk', flat=True))
-        if self.tiene_rol('tecnico'):
-            return ticket.asignaciones.filter(tecnico_id=self.pk, activo=True).exists()
-        return False
+        from tickets.permissions import puede_operar_ticket
+        return puede_operar_ticket(self, ticket)

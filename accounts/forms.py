@@ -36,7 +36,9 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email', 'roles', 'areas',
-                  'telefono', 'correo_notificaciones', 'activo_sistema', 'is_staff')
+                  'telefono', 'correo_notificaciones', 'is_active', 'is_staff')
+        labels = {'is_active': 'Cuenta habilitada'}
+        help_texts = {'is_active': 'Permite iniciar sesión y acceder al sistema.'}
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -45,6 +47,6 @@ class UserEditForm(forms.ModelForm):
             'areas': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'correo_notificaciones': forms.EmailInput(attrs={'class': 'form-control'}),
-            'activo_sistema': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_staff': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

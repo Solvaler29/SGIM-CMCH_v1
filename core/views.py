@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from tickets.models import Ticket
+from tickets.permissions import tickets_para_usuario
 from django.db.models import Count, Q
 
 @login_required
@@ -9,25 +9,21 @@ def dashboard(request):
     user = request.user
     context = {'usuario': user}
     context['es_administrador'] = user.tiene_rol('administrador')
+    tickets_qs = tickets_para_usuario(user)
+    context['tickets'] = tickets_qs.order_by('-created_at')[:10]
 
     if user.tiene_rol('solicitante'):
-        tickets_qs = Ticket.objects.filter(solicitante=user)
-        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
         context['titulo'] = 'Mis Incidencias Reportadas'
     elif user.tiene_rol('supervisor'):
         areas = user.areas.all()
-        tickets_qs = Ticket.objects.filter(Q(area_soporte__in=areas) | Q(solicitante=user)).distinct()
-        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
         context['areas'] = areas
         context['titulo'] = 'Bandeja del Área Asignada'
     elif user.tiene_rol('tecnico'):
-        tickets_qs = Ticket.objects.filter(Q(asignaciones__tecnico=user, asignaciones__activo=True) | Q(solicitante=user)).distinct()
-        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
         context['titulo'] = 'Mis Tareas y Atenciones'
-    else:  # administrador
-        tickets_qs = Ticket.objects.all()
-        context['tickets'] = tickets_qs.order_by('-created_at')[:10]
+    elif user.tiene_rol('administrador'):
         context['titulo'] = 'Panel de Control Hospitalario'
+    else:
+        context['titulo'] = 'Incidencias'
 
     estadisticas = tickets_qs.aggregate(
         total=Count('id'),

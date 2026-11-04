@@ -4,6 +4,10 @@ __pycache__/
 *.pyo
 *.pyd
 db.sqlite3
+*.sqlite3
+*.sqlite
+*.dump
+*.backup
 media/
 staticfiles/
 local_settings.py
@@ -11,7 +15,15 @@ local_settings.py
 # Environment variables
 .env
 .env.production
+.env.*
+!.env.example
 *.env
+
+# Private keys and certificates
+*.pem
+*.key
+*.pfx
+*.p12
 
 # Virtual environments
 venv/
@@ -28,6 +40,7 @@ ENV/
 
 # OS
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log

@@ -5,24 +5,22 @@
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-1">
-            <i class="fas fa-ticket-alt me-1"></i> Control de Incidencias
-        </span>
         <h2 class="fw-bold text-dark mb-0">
-            <i class="fas fa-clipboard-list text-danger me-2"></i>Bandeja de Incidencias y Mantenimiento
+            <i class="fas fa-clipboard-list text-danger me-2"></i>Tickets
         </h2>
-        <p class="text-muted small mb-0 mt-1">Seguimiento en tiempo real de los reportes, asignaciones y atenciones técnicas.</p>
     </div>
+    {% if puede_registrar_incidencia %}
     <div class="d-flex gap-2">
         <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-cmch-red rounded-pill px-4 shadow-sm fw-bold">
-            <i class="fas fa-plus-circle me-1"></i> + Reportar Incidencia
+            <i class="fas fa-plus-circle me-1"></i> + Registrar incidencia
         </a>
     </div>
+    {% endif %}
 </div>
 
 <div class="card-cmch">
     <div class="card-header header-red d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-list text-warning me-2"></i>Listado de Tickets Registrados</span>
+        <span><i class="fas fa-list text-warning me-2"></i>Listado de tickets</span>
         <span class="badge bg-white text-danger fw-bold px-3 py-1 rounded-pill">{{ tickets|length }} Registros</span>
     </div>
     <div class="card-body p-0">
@@ -86,10 +84,11 @@
                         <td colspan="8" class="text-center py-5 text-muted">
                             <i class="fas fa-folder-open fs-1 text-danger opacity-50 mb-3 d-block"></i>
                             <h5 class="fw-bold text-dark">No se encontraron tickets en esta bandeja</h5>
-                            <p class="small text-secondary mb-3">No hay registros pendientes o asignados según tus permisos actuales.</p>
+                            {% if puede_registrar_incidencia %}
                             <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-warning text-dark fw-bold rounded-pill px-4 shadow-sm">
-                                <i class="fas fa-plus-circle me-1"></i> Reportar Nueva Incidencia
+                                <i class="fas fa-plus-circle me-1"></i> Registrar incidencia
                             </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

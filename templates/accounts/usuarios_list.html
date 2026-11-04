@@ -14,7 +14,7 @@
                 <td>{{ u.get_full_name }}</td>
                 <td>{{ u.get_roles_display }}</td>
                 <td>{% for a in u.areas.all %}{{ a.nombre }}, {% endfor %}</td>
-                <td>{{ u.activo_sistema|yesno:"Sí,No" }}</td>
+                <td>{{ u.is_active|yesno:"Sí,No" }}</td>
                 <td><a href="{% url 'accounts:usuario_editar' u.pk %}" class="btn btn-sm btn-outline-primary">Editar</a></td>
             </tr>
             {% empty %}

@@ -28,7 +28,6 @@
             <a class="navbar-brand" href="{% url 'core:dashboard' %}">
                 <i class="fas fa-heart-pulse me-2 text-warning fs-5"></i>
                 <span>CMCH</span>
-                <span class="hospital-badge">Gestión Clínica</span>
             </a>
             
             <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Menu">
@@ -75,21 +74,25 @@
                             </a>
                         </li>
                         {% endif %}
+                        {% if puede_registrar_incidencia %}
                         <li class="nav-item d-lg-none mt-2 pt-2 border-top border-white border-opacity-10">
                             <a class="btn btn-warning text-dark fw-bold w-100 rounded-pill py-2 shadow-sm" href="{% url 'tickets:registrar_ticket' %}">
-                                <i class="fas fa-plus-circle text-danger me-1"></i> Reportar Incidencia
+                                <i class="fas fa-plus-circle text-danger me-1"></i> Registrar incidencia
                             </a>
                         </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 
                 <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
                     {% if user.is_authenticated %}
                         <!-- Botón Navbar para pantallas medianas y grandes -->
+                        {% if puede_registrar_incidencia %}
                         <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-nav-reportar d-none d-sm-inline-flex">
                             <i class="fas fa-plus-circle text-danger"></i>
-                            <span>Reportar Incidencia</span>
+                            <span>Registrar incidencia</span>
                         </a>
+                        {% endif %}
 
                         <!-- Perfil y Menú de Usuario -->
                         <div class="dropdown">
@@ -106,7 +109,12 @@
                                 </li>
                                 <li><a class="dropdown-item py-2 small" href="{% url 'accounts:perfil' %}"><i class="fas fa-id-badge me-2 text-danger"></i> Mi Perfil</a></li>
                                 <li><hr class="dropdown-divider my-1"></li>
-                                <li><a class="dropdown-item py-2 text-danger fw-semibold small" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                                <li>
+                                    <form method="post" action="{% url 'accounts:logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2 text-danger fw-semibold small"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</button>
+                                    </form>
+                                </li>
                             </ul>
                         </div>
                     {% else %}
@@ -143,9 +151,6 @@
             <div class="row align-items-center gy-2">
                 <div class="col-md-6 text-md-start small">
                     <span class="fw-bold text-danger"><i class="fas fa-hospital me-1"></i> Clínica Médica CMCH</span> — Sistema de Gestión de Incidencias
-                </div>
-                <div class="col-md-6 text-md-end text-muted small">
-                    <span class="badge bg-warning text-dark me-1" style="font-size: 0.68rem;">24/7</span> TI • Ing. Clínica • Mantenimiento
                 </div>
             </div>
         </div>

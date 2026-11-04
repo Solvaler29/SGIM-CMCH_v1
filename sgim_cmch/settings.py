@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tickets.context_processors.permisos_incidencias',
             ],
         },
     },
@@ -124,7 +125,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Archivos subidos por usuarios (medios de comunicación)
+# Evidencias privadas: conservar ubicación y nombres existentes.
+# MEDIA_URL no se publica; la lectura pasa por tickets:ver_evidencia.
+# Ningún servidor web debe exponer MEDIA_ROOT como directorio público.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

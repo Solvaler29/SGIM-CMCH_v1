@@ -18,16 +18,15 @@
                 {% endif %}
             </div>
             <h3 class="fw-bold text-dark mb-1">¡Bienvenida(o), {{ user.get_full_name|default:user.username }}!</h3>
-            <p class="text-muted small mb-0">
-                Gestión de incidencias y mantenimiento hospitalario en mobiliario, infraestructura y equipos biomédicos.
-            </p>
         </div>
+        {% if puede_registrar_incidencia %}
         <div class="text-nowrap mt-2 mt-md-0">
             <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-reportar-hero">
                 <i class="fas fa-plus-circle text-warning fs-5"></i>
-                <span>Reportar Incidencia</span>
+                <span>Registrar incidencia</span>
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -148,10 +147,11 @@
                             <div class="text-muted">
                                 <i class="fas fa-inbox fs-2 text-danger opacity-50 mb-2 d-block"></i>
                                 <h6 class="fw-bold text-dark">No hay incidencias registradas</h6>
-                                <p class="mb-3 text-secondary small">Si detectas una falla en mobiliario, instalaciones o equipos clínicos, repórtala aquí.</p>
+                                {% if puede_registrar_incidencia %}
                                 <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-cmch-red btn-sm fw-bold px-3 py-2 rounded-pill shadow-sm">
-                                    <i class="fas fa-plus-circle text-warning me-1"></i> Reportar Incidencia
+                                    <i class="fas fa-plus-circle text-warning me-1"></i> Registrar incidencia
                                 </a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

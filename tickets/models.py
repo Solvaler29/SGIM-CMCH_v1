@@ -107,21 +107,22 @@ class Ticket(models.Model):
         return f'{self.codigo_ticket} - {self.estado}'
 
     def save(self, *args, **kwargs):
-        if not self.codigo_ticket:
-            from django.utils import timezone
-            hoy = timezone.now().strftime('%Y%m%d')
-            ultimo = Ticket.objects.filter(
-                codigo_ticket__startswith=f'TIK-{hoy}-'
-            ).order_by('-codigo_ticket').first()
-            if ultimo:
-                try:
-                    num = int(ultimo.codigo_ticket.split('-')[-1]) + 1
-                except (ValueError, IndexError):
-                    num = 1
-            else:
-                num = 1
-            self.codigo_ticket = f'TIK-{hoy}-{num:04d}'
-        super().save(*args, **kwargs)
+        if self.codigo_ticket:
+            return super().save(*args, **kwargs)
+        from django.db import transaction
+        from .codigos import reservar_codigo
+        using = kwargs.get('using') or self._state.db or 'default'
+        guardado = False
+        try:
+            with transaction.atomic(using=using):
+                self.codigo_ticket = reservar_codigo(using)
+                resultado = super().save(*args, **kwargs)
+            guardado = True
+            return resultado
+        finally:
+            if not guardado:
+                self.codigo_ticket = ''
+
 
     def puede_ser_visto_por(self, usuario):
         return usuario.puede_ver_ticket(self)
@@ -186,12 +187,19 @@ class TicketAssignment(models.Model):
         related_name='asignaciones_hechas',
     )
     fecha_asignacion = models.DateTimeField(auto_now_add=True)
+    scheduled_at = models.DateTimeField(null=True, blank=True, verbose_name='Fecha y hora estimadas de atención')
     activo = models.BooleanField(default=True, help_text='Indica si es la asignación vigente')
 
     class Meta:
         verbose_name = 'Asignación'
         verbose_name_plural = 'Asignaciones'
         ordering = ['-fecha_asignacion']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ticket'], condition=models.Q(activo=True),
+                name='uniq_ticket_asignacion_activa',
+            ),
+        ]
 
     def __str__(self):
         return f'{self.ticket.codigo_ticket} -> {self.tecnico} ({self.fecha_asignacion})'
@@ -217,3 +225,9 @@ class Satisfaccion(models.Model):
 
     def __str__(self):
         return f'Encuesta {self.ticket.codigo_ticket} - {self.puntuacion}'
+
+
+class ContadorDiarioTicket(models.Model):
+    """Último correlativo reservado por fecha UTC; no se reinicia al borrar tickets."""
+    fecha = models.DateField(primary_key=True)
+    ultimo_correlativo = models.PositiveIntegerField(default=0)

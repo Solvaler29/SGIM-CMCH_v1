@@ -7,7 +7,7 @@
         <div class="card-cmch shadow-lg">
             <div class="card-header header-red d-flex align-items-center gap-2">
                 <i class="fas fa-user-clock text-warning fs-5"></i>
-                <span class="fs-5">Asignar y Programar Atención — Ticket {{ ticket.codigo_ticket }}</span>
+                <span class="fs-5">Asignar atención — Ticket {{ ticket.codigo_ticket }}</span>
             </div>
             <div class="card-body p-4">
                 <div class="p-3 bg-light rounded-3 mb-4 border">
@@ -18,20 +18,17 @@
 
                 <form method="post">
                     {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
                     <div class="mb-3">
-                        <label class="form-label-cmch"><i class="fas fa-user-gear text-danger me-1"></i> Seleccionar Técnico Encargado *</label>
-                        <select name="tecnico" class="form-select form-select-cmch" required>
-                            <option value="">-- Elige el técnico disponible --</option>
-                            {% for t in tecnicos %}
-                            <option value="{{ t.pk }}">{{ t.get_full_name|default:t.username }} ({{ t.areas.all.0.nombre|default:'Área asignada' }})</option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label-cmch"><i class="fas fa-user-gear text-danger me-1"></i> Técnico responsable *</label>
+                        {{ form.tecnico }}
+                        {% if form.tecnico.errors %}<div class="text-danger small">{{ form.tecnico.errors }}</div>{% endif %}
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label-cmch"><i class="fas fa-calendar-alt text-warning me-1"></i> Programar Fecha y Hora Estimada (Opcional)</label>
-                        <input type="datetime-local" name="scheduled_at" class="form-control form-control-cmch" value="{{ ticket.scheduled_at|date:'Y-m-d\TH:i' }}">
-                        <div class="form-text small">Indica al técnico y al solicitante cuándo se iniciará la reparación.</div>
+                        <label class="form-label-cmch"><i class="fas fa-calendar-alt text-warning me-1"></i> Fecha y hora estimadas (opcional)</label>
+                        {{ form.scheduled_at }}
+                        {% if form.scheduled_at.errors %}<div class="text-danger small">{{ form.scheduled_at.errors }}</div>{% endif %}
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">

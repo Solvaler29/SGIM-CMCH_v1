@@ -33,10 +33,10 @@
                     <div class="list-group-item d-flex justify-content-between px-0 py-3">
                         <span class="text-muted"><i class="fas fa-shield-halved text-danger me-2"></i>Estado de la Cuenta</span>
                         <span>
-                            {% if usuario.activo_sistema %}
-                                <span class="badge bg-success badge-cmch"><i class="fas fa-check me-1"></i> Activo en Clínica</span>
+                            {% if usuario.is_active %}
+                                <span class="badge bg-success badge-cmch"><i class="fas fa-check me-1"></i> Habilitada</span>
                             {% else %}
-                                <span class="badge bg-danger badge-cmch">Inactivo</span>
+                                <span class="badge bg-danger badge-cmch">Deshabilitada</span>
                             {% endif %}
                         </span>
                     </div>

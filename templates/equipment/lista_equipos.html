@@ -5,17 +5,15 @@
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-1">
-            <i class="fas fa-qrcode me-1"></i> Módulo de Identificación
-        </span>
         <h2 class="fw-bold text-dark mb-0">
-            <i class="fas fa-microchip text-danger me-2"></i>Catálogo de Equipamiento Biomédico y QR
+            <i class="fas fa-microchip text-danger me-2"></i>Catálogo de equipos
         </h2>
-        <p class="text-muted small mb-0 mt-1">Identificadores para asociar equipos clínicos a incidencias mediante lectura de código QR.</p>
     </div>
+    {% if puede_registrar_incidencia %}
     <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-cmch-red rounded-pill px-4 shadow-sm fw-bold">
-        <i class="fas fa-plus-circle me-1"></i> Reportar Falla en Equipo
+        <i class="fas fa-plus-circle me-1"></i> Registrar incidencia
     </a>
+    {% endif %}
 </div>
 
 <div class="card-cmch mb-4">
@@ -57,12 +55,5 @@
             </table>
         </div>
     </div>
-</div>
-
-<div class="card-cmch border-0 bg-white p-4 shadow-sm">
-    <h5 class="fw-bold text-danger mb-2"><i class="fas fa-circle-question text-warning me-2"></i>¿Cómo utilizar los códigos QR en el hospital?</h5>
-    <p class="text-muted small mb-0">
-        Cada equipo biomédico cuenta con una etiqueta física QR. Al presionar <strong>"Ingresar QR"</strong> en el formulario de reporte de incidencia, puedes ingresar códigos como <code>QR-DEMO-MON-001</code> o <code>QR-DEMO-INF-002</code> para que el sistema complete automáticamente la marca, modelo, serie y ubicación del equipo.
-    </p>
 </div>
 {% endblock %}

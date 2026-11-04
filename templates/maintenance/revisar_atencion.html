@@ -6,11 +6,8 @@
     <div class="col-lg-9">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-1">
-                    <i class="fas fa-clipboard-check me-1"></i> Control de Calidad y Supervisión
-                </span>
                 <h2 class="fw-bold text-dark mb-0">
-                    <i class="fas fa-check-double text-danger me-2"></i>Validar Solución Técnica y Conformidad
+                    <i class="fas fa-check-double text-danger me-2"></i>Revisar atención
                 </h2>
                 <div class="small text-muted mt-1">Ticket: <strong class="text-danger">{{ ticket.codigo_ticket }}</strong> | Técnico: <strong>{{ atencion.tecnico.get_full_name|default:atencion.tecnico.username }}</strong></div>
             </div>
@@ -23,7 +20,7 @@
         <div class="card-cmch mb-4">
             <div class="card-header header-red d-flex align-items-center gap-2">
                 <i class="fas fa-file-medical text-warning"></i>
-                <span>Informe de Intervención Presentado por el Técnico</span>
+                <span>Informe técnico</span>
             </div>
             <div class="card-body p-4">
                 <div class="row g-4 mb-3">
@@ -53,14 +50,14 @@
         <!-- Dictamen del Supervisor -->
         <div class="card-cmch shadow-sm">
             <div class="card-header bg-white border-bottom">
-                <span class="fw-bold text-dark fs-5"><i class="fas fa-gavel text-danger me-2"></i>Decisión y Dictamen de Conformidad</span>
+                <span class="fw-bold text-dark fs-5"><i class="fas fa-gavel text-danger me-2"></i>Revisión</span>
             </div>
             <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-4">
-                        <label class="form-label-cmch"><i class="fas fa-comment-dots text-danger me-1"></i> Justificación u Observaciones del Supervisor *</label>
-                        <textarea name="justificacion" class="form-control form-control-cmch" rows="3" placeholder="Indica si la solución fue probada en sitio y si queda operativa y conforme para el servicio..." required></textarea>
+                        <label class="form-label-cmch"><i class="fas fa-comment-dots text-danger me-1"></i> Justificación *</label>
+                        <textarea name="justificacion" class="form-control form-control-cmch" rows="3" required></textarea>
                     </div>
 
                     <div class="d-flex flex-column flex-sm-row justify-content-end gap-3">

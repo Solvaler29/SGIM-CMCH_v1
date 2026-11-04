@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}Reportar Incidencia - SGIM-CMCH{% endblock %}
+{% load static %}
+{% block title %}Registrar incidencia - SGIM-CMCH{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -7,13 +8,9 @@
         <!-- Encabezado con Guía Visual Amigable -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-1">
-                    <i class="fas fa-stethoscope me-1"></i> Formulario de Reporte Asistencial
-                </span>
                 <h2 class="fw-bold text-dark mb-0">
-                    <i class="fas fa-triangle-exclamation text-danger me-2"></i>Reportar Nueva Falla o Incidencia
+                    <i class="fas fa-triangle-exclamation text-danger me-2"></i>Registrar incidencia
                 </h2>
-                <p class="text-muted small mb-0 mt-1">Completa los datos para que el área técnica (Mantenimiento, TI o Ing. Clínica) programe la solución.</p>
             </div>
             <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary rounded-pill px-3">
                 <i class="fas fa-arrow-left me-1"></i> Volver al Inicio
@@ -23,32 +20,35 @@
         <!-- Formulario Principal -->
         <form method="post" enctype="multipart/form-data" id="formTicket" class="needs-validation">
             {% csrf_token %}
+            <p class="text-muted small">Reporta: <strong>{{ user.get_full_name|default:user.username }}</strong> · Los campos con * son obligatorios.</p>
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert" tabindex="-1" id="resumenErrores">Revisa los campos indicados. Por seguridad, vuelve a seleccionar la fotografía antes de enviar.</div>
+            {% endif %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
 
             <!-- TARJETA 1: UBICACIÓN Y ÁREA RESPONSABLE -->
             <div class="card-cmch mb-4">
                 <div class="card-header header-red d-flex align-items-center gap-2">
-                    <span class="badge bg-warning text-dark rounded-circle px-2 py-1 fw-bold">1</span>
-                    <span>¿Dónde ocurre el problema y quién debe atenderlo?</span>
+                    <span>Ubicación y área responsable</span>
                 </div>
                 <div class="card-body p-4">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label-cmch"><i class="fas fa-hospital-user text-danger me-1"></i> Servicio / Ubicación Clínica *</label>
+                            <label class="form-label-cmch" for="id_servicio"><i class="fas fa-hospital-user text-danger me-1"></i> Servicio / Ubicación Clínica *</label>
                             {{ form.servicio }}
-                            <div class="form-text small">Ej: Urgencias, Hospitalización Piso 3, UCI.</div>
-                            {% if form.servicio.errors %}<div class="text-danger small mt-1">{{ form.servicio.errors }}</div>{% endif %}
+                            {% if form.servicio.errors %}<div id="error_servicio" class="text-danger small mt-1" role="alert">{{ form.servicio.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label-cmch"><i class="fas fa-layer-group text-danger me-1"></i> Tipo de Falla / Objeto *</label>
+                            <label class="form-label-cmch" for="id_area_problema"><i class="fas fa-layer-group text-danger me-1"></i> Tipo de Falla / Objeto *</label>
                             {{ form.area_problema }}
-                            <div class="form-text small">Ej: Mobiliario, Luces, Redes, Equipos.</div>
-                            {% if form.area_problema.errors %}<div class="text-danger small mt-1">{{ form.area_problema.errors }}</div>{% endif %}
+                            {% if form.area_problema.errors %}<div id="error_area_problema" class="text-danger small mt-1" role="alert">{{ form.area_problema.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label-cmch"><i class="fas fa-screwdriver-wrench text-danger me-1"></i> Área de Soporte Destino *</label>
+                            <label class="form-label-cmch" for="id_area_soporte"><i class="fas fa-screwdriver-wrench text-danger me-1"></i> Área de Soporte Destino *</label>
                             {{ form.area_soporte }}
-                            <div class="form-text small">Mantenimiento, TI o Ing. Clínica.</div>
-                            {% if form.area_soporte.errors %}<div class="text-danger small mt-1">{{ form.area_soporte.errors }}</div>{% endif %}
+                            {% if form.area_soporte.errors %}<div id="error_area_soporte" class="text-danger small mt-1" role="alert">{{ form.area_soporte.errors }}</div>{% endif %}
                         </div>
                     </div>
                 </div>
@@ -57,20 +57,18 @@
             <!-- TARJETA 2: DESCRIPCIÓN DEL PROBLEMA -->
             <div class="card-cmch mb-4">
                 <div class="card-header header-red d-flex align-items-center gap-2">
-                    <span class="badge bg-warning text-dark rounded-circle px-2 py-1 fw-bold">2</span>
-                    <span>¿Cuál es el problema en detalle?</span>
+                    <span>Descripción</span>
                 </div>
                 <div class="card-body p-4">
                     <div class="mb-3">
-                        <label class="form-label-cmch"><i class="fas fa-pen-to-square text-danger me-1"></i> Explica qué está fallando o roto *</label>
+                        <label class="form-label-cmch" for="id_descripcion"><i class="fas fa-pen-to-square text-danger me-1"></i> Descripción del problema *</label>
                         {{ form.descripcion }}
-                        <div class="form-text small">Describe de forma sencilla qué ocurre (ej: "La camilla de traslado no frena bien en la rueda izquierda", "El monitor no enciende", "La impresora no tiene red").</div>
-                        {% if form.descripcion.errors %}<div class="text-danger small mt-1">{{ form.descripcion.errors }}</div>{% endif %}
+                        {% if form.descripcion.errors %}<div id="error_descripcion" class="text-danger small mt-1" role="alert">{{ form.descripcion.errors }}</div>{% endif %}
                     </div>
                     <div class="mb-0">
-                        <label class="form-label-cmch"><i class="fas fa-shield-halved text-secondary me-1"></i> ¿Se realizó alguna acción previa? (Opcional)</label>
+                        <label class="form-label-cmch" for="id_acciones_previas"><i class="fas fa-shield-halved text-secondary me-1"></i> Acciones previas (opcional)</label>
                         {{ form.acciones_previas }}
-                        <div class="form-text small">Ej: "Se desconectó para evitar riesgos", "Se retiró temporalmente del pasillo".</div>
+                        {% if form.acciones_previas.errors %}<div id="error_acciones_previas" class="text-danger small" role="alert">{{ form.acciones_previas.errors }}</div>{% endif %}
                     </div>
                 </div>
             </div>
@@ -79,25 +77,26 @@
             <div class="card-cmch mb-4">
                 <div class="card-header header-red d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-warning text-dark rounded-circle px-2 py-1 fw-bold">3</span>
-                        <span>Fotografía de la Falla (Obligatorio)</span>
+                        <span>Fotografía *</span>
                     </div>
-                    <span class="badge bg-warning text-dark fw-bold"><i class="fas fa-camera me-1"></i> Foto de Evidencia</span>
                 </div>
                 <div class="card-body p-4">
-                    <div class="p-4 rounded-3 border bg-light text-center">
-                        <i class="fas fa-camera-retro fs-1 text-danger mb-2 d-block"></i>
-                        <h6 class="fw-bold text-dark mb-1">Adjunta una foto clara del mueble o equipo con problema</h6>
-                        <p class="text-muted small mb-3">Permite que el técnico identifique el repuesto o herramienta antes de trasladarse.</p>
-                        
-                        <div class="row justify-content-center">
-                            <div class="col-md-8 col-lg-6">
-                                {{ form.fotografia }}
-                                <div class="form-text small text-muted mt-2">Formatos aceptados: JPG, PNG, WEBP (Máximo 5 MB).</div>
-                                {% if form.fotografia.errors %}<div class="text-danger fw-bold small mt-1">{{ form.fotografia.errors }}</div>{% endif %}
-                            </div>
-                        </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <button type="button" id="tomarFoto" class="btn btn-cmch-red" hidden><i class="fas fa-camera me-1" aria-hidden="true"></i> Tomar fotografía</button>
                     </div>
+                    <div id="capturaNativa" class="mb-3">
+                        <label for="fotoCamara" class="form-label-cmch">Tomar fotografía</label>
+                        <input type="file" name="fotografia_camara" id="fotoCamara" accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" class="form-control" aria-describedby="ayudaFoto estadoFoto error_fotografia">
+                    </div>
+                    <label for="id_fotografia" class="form-label-cmch">Subir fotografía</label>
+                    <input type="file" name="fotografia" id="id_fotografia" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" aria-describedby="ayudaFoto estadoFoto error_fotografia" {% if form.fotografia.errors %}aria-invalid="true"{% endif %}>
+                    <div id="ayudaFoto" class="form-text">Una fotografía obligatoria · JPG, PNG, WEBP o GIF · Máximo 5 MB.</div>
+                    <p id="estadoFoto" role="status" aria-live="polite" class="small mt-2 mb-0"></p>
+                    {% if form.fotografia.errors %}<div id="error_fotografia" class="text-danger small" role="alert">{{ form.fotografia.errors }}</div>{% endif %}
+                    <figure id="vistaFoto" class="mt-3 mb-0" hidden>
+                        <img id="imagenFoto" alt="Vista previa de la fotografía de la incidencia" style="max-width:100%;max-height:320px;object-fit:contain;border-radius:12px">
+                        <figcaption id="nombreFoto" class="small text-muted mt-1 text-break"></figcaption>
+                    </figure>
                 </div>
             </div>
 
@@ -105,16 +104,15 @@
             <div class="card-cmch mb-4">
                 <div class="card-header bg-white d-flex align-items-center justify-content-between border-bottom">
                     <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-secondary text-white rounded-circle px-2 py-1 fw-bold">4</span>
-                        <span class="fw-bold text-dark">¿Se trata de un equipo médico con código QR? (Opcional)</span>
+                        <span class="fw-bold text-dark">Equipo (opcional)</span>
                     </div>
-                    <span class="badge bg-light text-muted border">Opcional</span>
                 </div>
                 <div class="card-body p-4">
                     <div class="row align-items-center mb-3">
                         <div class="col-md-7 mb-3 mb-md-0">
-                            <label class="form-label-cmch">Seleccionar del catálogo o identificar:</label>
+                            <label class="form-label-cmch" for="id_equipo">Equipo asociado</label>
                             {{ form.equipo }}
+                        {% if form.equipo.errors %}<div id="error_equipo" class="text-danger small" role="alert">{{ form.equipo.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-5 d-flex gap-2">
                             <button type="button" class="btn btn-outline-danger flex-grow-1" id="btnEscanearQR">
@@ -144,8 +142,8 @@
             <!-- BOTONES DE ENVÍO -->
             <div class="card-cmch p-3 bg-white text-center shadow-sm">
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
-                    <button type="submit" class="btn btn-cmch-red btn-lg px-5 py-3 shadow fw-bold fs-5 rounded-pill">
-                        <i class="fas fa-paper-plane me-2"></i> Enviar Reporte de Incidencia
+                    <button type="submit" id="enviarIncidencia" class="btn btn-cmch-red btn-lg px-5 py-3 shadow fw-bold fs-5 rounded-pill">
+                        <i class="fas fa-paper-plane me-2"></i> Registrar incidencia
                     </button>
                     <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary btn-lg px-4 py-3 rounded-pill">
                         Cancelar
@@ -156,16 +154,30 @@
     </div>
 </div>
 
+<dialog id="dialogoCamara" aria-labelledby="tituloCamara" style="border:0;border-radius:16px;padding:1.25rem;width:min(94vw,640px);max-height:94vh;overflow:auto">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 id="tituloCamara" class="h5 mb-0">Tomar fotografía</h3>
+        <button type="button" id="cerrarCamara" class="btn btn-outline-secondary btn-sm" aria-label="Cerrar cámara">Cerrar</button>
+    </div>
+    <video id="videoCamara" autoplay muted playsinline style="width:100%;max-height:55vh;object-fit:contain" aria-label="Vista de la cámara"></video>
+    <canvas id="fotoCanvas" hidden style="width:100%;max-height:55vh;object-fit:contain" aria-label="Fotografía capturada"></canvas>
+    <p id="estadoCamara" class="small" role="status" aria-live="polite"></p>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" id="capturarFoto" class="btn btn-cmch-red">Capturar</button>
+        <button type="button" id="repetirFoto" class="btn btn-outline-secondary" hidden>Repetir</button>
+        <button type="button" id="confirmarFoto" class="btn btn-cmch-red" hidden>Usar fotografía</button>
+    </div>
+</dialog>
+
 <!-- Modal de selección de equipos simulados (Prueba QR) -->
 <div class="modal fade" id="modalEquipos" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-danger text-white rounded-top-4">
-                <h5 class="modal-title fw-bold"><i class="fas fa-microchip me-2 text-warning"></i>Catálogo de Equipos Simulados (Demo QR)</h5>
+                <h5 class="modal-title fw-bold"><i class="fas fa-microchip me-2 text-warning"></i>Equipos de prueba</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="text-muted small">Haz clic en <strong>"Asociar a la Incidencia"</strong> en el equipo deseado para seleccionarlo automáticamente:</p>
                 <div class="list-group list-group-flush border rounded-3">
                     {% for eq in equipos_demo %}
                     <div class="list-group-item d-flex justify-content-between align-items-center p-3">
@@ -195,6 +207,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/registro_fotografia.js' %}" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Escaneo / Ingreso manual de identificador QR

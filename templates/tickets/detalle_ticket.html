@@ -21,9 +21,11 @@
         <a href="{% url 'tickets:lista_tickets' %}" class="btn btn-outline-secondary rounded-pill px-4">
             <i class="fas fa-arrow-left me-1"></i> Volver a la Lista
         </a>
+        {% if puede_registrar_incidencia %}
         <a href="{% url 'tickets:registrar_ticket' %}" class="btn btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm">
-            <i class="fas fa-plus me-1"></i> Nuevo Reporte
+            <i class="fas fa-plus me-1"></i> Registrar incidencia
         </a>
+        {% endif %}
     </div>
 </div>
 
@@ -98,10 +100,9 @@
                 <span class="badge bg-warning text-dark">Foto Adjunta</span>
             </div>
             <div class="card-body text-center p-3">
-                <a href="{{ ticket.fotografia.url }}" target="_blank" title="Clic para ampliar imagen">
-                    <img src="{{ ticket.fotografia.url }}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 250px; object-fit: contain;" alt="Evidencia de falla">
+                <a href="{% url 'tickets:ver_evidencia' ticket.pk %}" target="_blank" rel="noopener" title="Clic para ampliar imagen">
+                    <img src="{% url 'tickets:ver_evidencia' ticket.pk %}" class="img-fluid rounded-3 border shadow-sm" style="max-height: 250px; object-fit: contain;" alt="Evidencia de falla">
                 </a>
-                <div class="small text-muted mt-2"><i class="fas fa-search-plus me-1"></i> Clic en la foto para ver en tamaño original</div>
             </div>
         </div>
         {% endif %}
@@ -112,7 +113,7 @@
         <div class="card-cmch h-100">
             <div class="card-header header-red d-flex align-items-center gap-2">
                 <i class="fas fa-cogs text-warning"></i>
-                <span>Gestión y Flujo</span>
+                <span>Acciones</span>
             </div>
             <div class="card-body p-4">
 
@@ -146,55 +147,66 @@
                             <i class="fas fa-user-clock text-warning fs-5"></i>
                             <strong>Sin Técnico Asignado</strong>
                         </div>
-                        <div class="small text-muted">Esta incidencia está a la espera de que el supervisor designe un responsable.</div>
                     </div>
                 {% endif %}
 
                 <!-- 2. ACCIONES CON ESPACIADO CÓMODO (d-flex flex-column gap-3) -->
-                {% if user.es_supervisor %}
-                    <div class="small fw-bold text-muted mb-3 text-uppercase">Acciones de Supervisor</div>
+                {% if puede_asignar or puede_clasificar or puede_redirigir %}
                     <div class="d-flex flex-column gap-3 mb-4">
+                        {% if puede_asignar %}
                         <a href="{% url 'tickets:asignar_tecnico' ticket.pk %}" class="btn btn-cmch-red py-2 px-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-user-gear"></i>
                             <span>{% if asignacion_vigente %}Reasignar Técnico{% else %}Asignar Técnico{% endif %}</span>
                         </a>
+                        {% endif %}
+                        {% if puede_clasificar %}
                         <a href="{% url 'tickets:priorizar_ticket' ticket.pk %}" class="btn btn-outline-dark py-2 px-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-arrow-up-wide-short text-danger"></i>
                             <span>Cambiar Prioridad</span>
                         </a>
+                        {% endif %}
+                        {% if puede_redirigir %}
                         <a href="{% url 'tickets:redirigir_ticket' ticket.pk %}" class="btn btn-outline-warning text-dark py-2 px-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-arrow-right-arrow-left text-warning"></i>
                             <span>Redirigir Área</span>
                         </a>
+                        {% endif %}
                     </div>
                 {% endif %}
 
-                {% if user.es_tecnico and ticket.estado == 'asignada' %}
-                    <div class="small fw-bold text-muted mb-3 text-uppercase">Acciones de Técnico</div>
+                {% if puede_iniciar_atencion %}
                     <div class="d-flex flex-column gap-3 mb-4">
-                        <a href="{% url 'maintenance:iniciar_atencion' ticket.pk %}" class="btn btn-success py-2 px-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
-                            <i class="fas fa-play"></i>
-                            <span>Iniciar Atención Técnica</span>
-                        </a>
+                        <form method="post" action="{% url 'maintenance:iniciar_atencion' ticket.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100 py-2 px-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="fas fa-play"></i>
+                                <span>Iniciar Atención Técnica</span>
+                            </button>
+                        </form>
                     </div>
                 {% endif %}
 
-                {% if user.es_tecnico and ticket.estado == 'en_atencion' %}
-                    <div class="small fw-bold text-muted mb-3 text-uppercase">Intervención en Progreso</div>
+                {% if puede_editar_atencion or puede_finalizar_atencion %}
                     <div class="d-flex flex-column gap-3 mb-4">
+                        {% if puede_editar_atencion %}
                         <a href="{% url 'maintenance:registrar_atencion' ticket.pk %}" class="btn btn-primary py-2 px-3 fw-bold d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-file-pen"></i>
                             <span>Registrar Acciones / Materiales</span>
                         </a>
-                        <a href="{% url 'maintenance:finalizar_atencion' ticket.pk %}" class="btn btn-success py-2 px-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Finalizar Atención</span>
-                        </a>
+                        {% endif %}
+                        {% if puede_finalizar_atencion %}
+                        <form method="post" action="{% url 'maintenance:finalizar_atencion' ticket.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100 py-2 px-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Finalizar Atención</span>
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
                 {% endif %}
 
-                {% if user.es_supervisor and ticket.estado == 'pendiente_validacion' %}
-                    <div class="small fw-bold text-muted mb-3 text-uppercase">Validación de Supervisor</div>
+                {% if puede_revisar and ticket.estado == 'pendiente_validacion' %}
                     <div class="d-flex flex-column gap-3 mb-4">
                         <a href="{% url 'maintenance:revisar_atencion' ticket.pk %}" class="btn btn-warning text-dark py-2 px-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-clipboard-check text-danger"></i>
@@ -207,7 +219,6 @@
                     <div class="p-3 bg-success bg-opacity-10 border border-success rounded-3 text-center text-success mb-2">
                         <i class="fas fa-circle-check fs-2 d-block mb-1"></i>
                         <strong class="d-block">Cierre Conforme</strong>
-                        <small>Incidencia validada por el supervisor y cerrada con éxito.</small>
                     </div>
                 {% endif %}
 
@@ -219,7 +230,7 @@
 <!-- HISTORIAL DE AUDITORÍA Y TRAZABILIDAD -->
 <div class="card-cmch mb-4">
     <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between">
-        <span class="fw-bold text-dark"><i class="fas fa-timeline text-danger me-2"></i>Historial de Eventos y Trazabilidad</span>
+        <span class="fw-bold text-dark"><i class="fas fa-timeline text-danger me-2"></i>Historial del ticket</span>
         <span class="badge bg-light text-muted border">{{ eventos|length }} Acciones</span>
     </div>
     <div class="card-body p-0">
@@ -254,7 +265,7 @@
 <!-- ASIGNACIONES DE TÉCNICOS -->
 <div class="card-cmch">
     <div class="card-header bg-white border-bottom">
-        <span class="fw-bold text-dark"><i class="fas fa-user-gear text-danger me-2"></i>Registro de Asignaciones Técnicas</span>
+        <span class="fw-bold text-dark"><i class="fas fa-user-gear text-danger me-2"></i>Asignaciones</span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -264,6 +275,7 @@
                         <th>Técnico Asignado</th>
                         <th>Asignado por</th>
                         <th>Fecha de Asignación</th>
+                        <th>Atención programada</th>
                         <th>Vigencia</th>
                     </tr>
                 </thead>
@@ -273,6 +285,7 @@
                         <td class="fw-bold text-dark">{{ a.tecnico.get_full_name|default:a.tecnico.username }}</td>
                         <td>{{ a.asignado_por.get_full_name|default:a.asignado_por.username }}</td>
                         <td class="small text-muted">{{ a.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                        <td class="small text-muted">{{ a.scheduled_at|date:"d/m/Y H:i"|default:"Sin programación registrada" }}</td>
                         <td>
                             {% if a.activo %}
                                 <span class="badge bg-success badge-cmch"><i class="fas fa-check me-1"></i> Asignación Vigente</span>
